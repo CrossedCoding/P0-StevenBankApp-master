@@ -60,9 +60,11 @@ public class UserDaoDB implements UserDao {
 			pstmt.setInt(1, user.getId());
 			pstmt.setString(2, user.getFirstName());
 			pstmt.setString(3, user.getLastName());
-			pstmt.setString(5, user.getPassword());
-			pstmt.setString(4, user.getUsername());
-			pstmt.setString(6, user.getUserType().name());
+			pstmt.setString(4, user.getPassword());
+			pstmt.setString(5, user.getUsername());
+			
+			System.out.println("userType = " + user.getUserType());
+			pstmt.setString(6, user.getUserType().toString());
 
 			pstmt.executeUpdate();
 
@@ -225,7 +227,7 @@ public class UserDaoDB implements UserDao {
 //			UserType enumVal = UserType.valueOf(type);
 //			pstmt.setString(5, user.getUserType().name());
 			
-			System.out.println(u);
+			//System.out.println(u);
 			
 			int result = pstmt.executeUpdate(); 
 				

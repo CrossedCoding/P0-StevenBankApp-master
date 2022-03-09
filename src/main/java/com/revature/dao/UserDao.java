@@ -36,7 +36,7 @@ public interface UserDao {
 	 * Retrieves all users in the persistence layer
 	 * @return a list of all users
 	 */
-	public List<User> getAllUsers();
+	public List<User> getAllUsers(); 
 	
 	/**
 	 * Updates a specific user

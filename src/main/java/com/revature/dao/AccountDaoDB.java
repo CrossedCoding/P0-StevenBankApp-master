@@ -30,7 +30,7 @@ public class AccountDaoDB implements AccountDao {
 	
 		getConnection();
 	
-		String query = "insert into account (owner_id, balance, account_type, approved) values (?,?,?,?)";
+		String query = "insert into account (ownerId, balance, type, approved) values (?,?,?,?)";
 
 		try {
 
@@ -38,7 +38,7 @@ public class AccountDaoDB implements AccountDao {
 
 			pstmt.setInt(1, a.getOwnerId());
 			pstmt.setDouble(2, a.getBalance());
-			pstmt.setObject(3, a.getType());
+			pstmt.setObject(3, a.getType().name());
 			pstmt.setBoolean(4, a.isApproved());
 
 			pstmt.executeUpdate();
@@ -58,7 +58,7 @@ public class AccountDaoDB implements AccountDao {
 
 		getConnection();
 		
-		String query = "select * from account where id=" + actId;
+		String query = "select * from account where ownerId = " + actId;
 		Account a = new Account();
 
 		try {
@@ -66,13 +66,16 @@ public class AccountDaoDB implements AccountDao {
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(query);
 
-			if (rs.next()) {
+			while (rs.next()) {
 
-				a.setId(rs.getInt("id"));
-				a.setOwnerId(rs.getInt("owner_id"));
+				a.setId(rs.getInt("accountId"));
+				a.setOwnerId(rs.getInt("ownerId"));
 				a.setBalance(rs.getDouble("balance"));
-				a.setType((AccountType) rs.getObject("account_type"));
 				a.setApproved(rs.getBoolean("approved"));
+				
+				String type = rs.getString("type");
+				AccountType enumVal = AccountType.valueOf(type);
+				a.setType(enumVal);
 								
 			}
 
@@ -82,6 +85,7 @@ public class AccountDaoDB implements AccountDao {
 
 		}
 
+		
 		return a;
 
 	}
@@ -93,7 +97,7 @@ public class AccountDaoDB implements AccountDao {
 		
 		List<Account> accountList = new ArrayList<Account>();
 		
-		String query = "select * from accounts";
+		String query = "select * from account";
 		
 		try {
 			
@@ -104,7 +108,7 @@ public class AccountDaoDB implements AccountDao {
 				
 				Account account = new Account();
 				
-				account.setId(rs.getInt("accoundId"));
+				account.setId(rs.getInt("accountId"));
 				account.setOwnerId(rs.getInt("ownerId"));
 				account.setBalance(rs.getDouble("balance"));
 				
@@ -133,7 +137,7 @@ public class AccountDaoDB implements AccountDao {
 
 		getConnection();
 		
-		String query = "SELECT * from account where owner_id =" + u.getId();
+		String query = "SELECT * from account where ownerId =" + u.getId();
 		
 		List<Account> accountList = new ArrayList<Account>();
 		
@@ -144,8 +148,9 @@ public class AccountDaoDB implements AccountDao {
 			
 			if(rs.next()) {
 				
-				Account account = new Account();
 				
+				Account account = new Account();
+			
 				account.setId(rs.getInt("ownerId"));
 				
 				account.setBalance(rs.getDouble("balance"));
@@ -175,14 +180,16 @@ public class AccountDaoDB implements AccountDao {
 		
 		getConnection();
 		
-		String query = "update account set balance = ? WHERE accountId = ?";
+		String query = "update account set ownerId = ?,  balance = ?, type = ?, approved = ? WHERE accountId = ?";
 		
 		try {
 			
 			pstmt = conn.prepareStatement(query);
-			pstmt.setDouble(1, a.getBalance());
-			pstmt.setInt(2, a.getOwnerId());
-	
+			pstmt.setDouble(1, a.getOwnerId());
+			pstmt.setDouble(2, a.getBalance());
+			pstmt.setString(3, a.getType().name());
+			pstmt.setBoolean(4, a.isApproved());
+			pstmt.setInt(5, a.getId());
 			pstmt.executeUpdate();
 			
 			return a;

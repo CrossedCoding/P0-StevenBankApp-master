@@ -15,6 +15,7 @@ public class Transaction implements Serializable {
 	public static enum TransactionType {
 		WITHDRAWAL, DEPOSIT, TRANSFER
 	}
+	
 	private Account fromAccountId;
 	private Account toAccountId;
 	private Double amount;
