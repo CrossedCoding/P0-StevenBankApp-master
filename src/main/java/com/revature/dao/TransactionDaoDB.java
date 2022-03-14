@@ -29,7 +29,7 @@ public class TransactionDaoDB implements TransactionDao {
 //		conn = ConnectionUtil.getConnection();
 //
 //	}
-
+	
 	public List<Transaction> getAllTransactions() {
 		// TODO Auto-generated method stub
 		
@@ -74,6 +74,63 @@ public class TransactionDaoDB implements TransactionDao {
 		}
 
 		return transactionList;
+		
+	}
+	
+	public Transaction addTransaction(Transaction t) {
+		
+		getConnection();
+		
+		String query = "Insert into transaction (fromAccountId, type, amount, timeStamp) values (?,?,?,?)";
+		
+		try {
+		
+			pstmt = conn.prepareStatement(query);
+			
+			pstmt.setInt(1, t.getSender().getId());
+			pstmt.setString(2, t.getType().name());
+			pstmt.setDouble(3, t.getAmount());
+			pstmt.setObject(4, t.getTimestamp());
+			
+			pstmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			// TODO: handle exception
+		
+			e.printStackTrace();
+			
+		}
+		
+		return t;
+		
+	}
+	
+	public Transaction addTransaction(Transaction t, Account recp) {
+		
+		getConnection();
+		
+		String query = "Insert into transaction (fromAccountId, toAccountId, type, amount, timeStamp) values (?,?,?,?,?)";
+		
+		try {
+		
+			pstmt = conn.prepareStatement(query);
+			
+			pstmt.setInt(1, t.getSender().getId());
+			pstmt.setInt(2, recp.getId());
+			pstmt.setString(3, t.getType().name());
+			pstmt.setDouble(4, t.getAmount());
+			pstmt.setObject(5, t.getTimestamp());
+			
+			pstmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			// TODO: handle exception
+		
+			e.printStackTrace();
+			
+		}
+		
+		return t;
 		
 	}
 	

@@ -16,6 +16,7 @@ import com.revature.beans.Transaction.TransactionType;
 import com.revature.beans.User.UserType;
 import com.revature.dao.AccountDao;
 import com.revature.dao.AccountDaoDB;
+import com.revature.dao.TransactionDaoDB;
 import com.revature.exceptions.OverdraftException;
 import com.revature.exceptions.UnauthorizedException;
 import com.revature.utils.SessionCache;
@@ -29,6 +30,7 @@ public class AccountService {
 	public AccountDao actDao;
 	public static final double STARTING_BALANCE = 25d;
 
+	public static TransactionDaoDB tDao;
 	public static Connection conn;
 
 	public AccountService(AccountDao dao) {
@@ -43,7 +45,7 @@ public class AccountService {
 	 * @throws UnsupportedOperationException if amount is negative
 	 */
 	public void withdraw(Account a, Double amount) {
-		
+
 		getConnection();
 
 		double newBal = a.getBalance() - amount;
@@ -78,14 +80,6 @@ public class AccountService {
 			// Temporarily holds the transaction amount and determines the transaction type
 			// It then makes final changes to the account's transaction list and updates
 
-			transc.setAmount(amount);
-
-			transc.setType(TransactionType.WITHDRAWAL);
-
-			transac.add(transc);
-
-			a.setTransactions(transac);
-
 			actDao.updateAccount(a);
 
 		}
@@ -100,31 +94,36 @@ public class AccountService {
 	public void deposit(Account a, Double amount) {
 
 		getConnection();
-		
-		
-	if (!a.isApproved()) {
-			
+
+		Boolean approveCheck = a.isApproved();
+
+		if (approveCheck.equals(0)) {
+
 			System.out.println("Sorry, your account is not approved!");
-			
-			//throw new UnsupportedOperationException();
-			
+
+			// throw new UnsupportedOperationException();
+
 		}
-		else if(amount > 0) {
-		double newBalance = 0;
-		
-		newBalance = a.getBalance() + amount;
-		
-		a.setBalance(newBalance);
-		
-		System.out.println("Succesfully deposited to account");
-		
-		actDao.updateAccount(a);
+
+		else if (amount > 0) {
+
+			double newBalance = 0;
+
+			newBalance = a.getBalance() + amount;
+
+			a.setBalance(newBalance);
+
+			System.out.println("Succesfully deposited to account");
+
+			// Adding transactions information to transaction table
+
+			actDao.updateAccount(a);
 		}
-		
+
 		else {
 			System.out.println("The amount entered was a negative dollar amount. Please try again");
 		}
-	
+
 	}
 
 	/**
@@ -142,7 +141,7 @@ public class AccountService {
 	public void transfer(Account fromAct, Account toAct, double amount) {
 
 		getConnection();
-		
+
 		double fBal = fromAct.getBalance() - amount;
 		double tBal = toAct.getBalance() + amount;
 
@@ -150,56 +149,59 @@ public class AccountService {
 
 			throw new UnsupportedOperationException();
 
-		} else {
-
-			fromAct.setBalance(fBal);
-			toAct.setBalance(tBal);
-
-			Transaction transc = new Transaction();
-			Transaction transca = new Transaction();
-
-			transc.setSender(fromAct);
-			transc.setRecipient(toAct);
-			transc.setAmount(amount);
-			transc.setType(TransactionType.TRANSFER);
-
-			transca.setSender(fromAct);
-			transca.setRecipient(toAct);
-			transca.setAmount(amount);
-			transca.setType(TransactionType.TRANSFER);
-
-			List<Transaction> tranFr;
-			List<Transaction> tranTo;
-
-			if (fromAct.getTransactions() == null) {
-
-				tranFr = new ArrayList<>();
-
-			} else {
-
-				tranFr = fromAct.getTransactions();
-
-			}
-
-			tranFr.add(transc);
-
-			if (toAct.getTransactions() == null) {
-
-				tranTo = new ArrayList<>();
-
-			} else {
-
-				tranTo = toAct.getTransactions();
-
-			}
-
-			tranTo.add(transca);
-			toAct.setTransactions(tranTo);
-
-			actDao.updateAccount(toAct);
-			actDao.updateAccount(fromAct);
-
+			// Initial attempt at putting transaction information inside AccountService
 		}
+//		 else {
+//
+//			fromAct.setBalance(fBal);
+//			toAct.setBalance(tBal);
+//
+//			Transaction transc = new Transaction();
+//			Transaction transca = new Transaction();
+//
+//			transc.setSender(fromAct);
+//			transc.setRecipient(toAct);
+//			transc.setAmount(amount);
+//			transc.setType(TransactionType.TRANSFER);
+//
+//			transca.setSender(fromAct);
+//			transca.setRecipient(toAct);
+//			transca.setAmount(amount);
+//			transca.setType(TransactionType.TRANSFER);
+//
+//			List<Transaction> tranFr;
+//			List<Transaction> tranTo;
+//
+//			if (fromAct.getTransactions() == null) {
+//
+//				tranFr = new ArrayList<>();
+//
+//			} else {
+//
+//				tranFr = fromAct.getTransactions();
+//
+//			}
+//
+//			tranFr.add(transc);
+//
+//			if (toAct.getTransactions() == null) {
+//
+//				tranTo = new ArrayList<>();
+//
+//			} else {
+//
+//				tranTo = toAct.getTransactions();
+//
+//			}
+//
+//			tranTo.add(transca);
+//			toAct.setTransactions(tranTo);
+
+		toAct.setBalance(tBal);
+		actDao.updateAccount(toAct);
+		
+		fromAct.setBalance(fBal);
+		actDao.updateAccount(fromAct);
 
 	}
 
@@ -211,9 +213,9 @@ public class AccountService {
 	public Account createNewAccount(User u) {
 
 		getConnection();
-		
-	//	System.out.println("Inside create user");
-		
+
+		// System.out.println("Inside create user");
+
 		getConnection();
 
 		Account a = new Account();
@@ -227,7 +229,6 @@ public class AccountService {
 
 //		List<Account> accounts = adb.getAccountsByUser(SessionCache.getCurrentUser().get());
 
-		
 		System.out.println("Please choose account type CHECKINGS, SAVINGS: ");
 
 		Scanner scan = new Scanner(System.in);
@@ -256,7 +257,7 @@ public class AccountService {
 		}
 
 		adb.addAccount(a);
-		
+
 		System.out.println(a.getType() + " account made!");
 
 		return a;
@@ -274,7 +275,7 @@ public class AccountService {
 	public boolean approveOrRejectAccount(Account a, boolean approval) {
 
 		getConnection();
-		
+
 		if (approval == true) {
 
 			a.setApproved(true);

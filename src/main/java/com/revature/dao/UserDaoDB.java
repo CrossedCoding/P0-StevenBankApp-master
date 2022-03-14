@@ -62,9 +62,9 @@ public class UserDaoDB implements UserDao {
 			pstmt.setString(3, user.getLastName());
 			pstmt.setString(4, user.getPassword());
 			pstmt.setString(5, user.getUsername());
-			
+
 			System.out.println("userType = " + user.getUserType());
-			pstmt.setString(6, user.getUserType().toString());
+			pstmt.setString(6, user.getUserType().name());
 
 			pstmt.executeUpdate();
 
@@ -94,26 +94,26 @@ public class UserDaoDB implements UserDao {
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(query);
 
-			while(rs.next()) {
+			if (rs.next()) {
 
-					user.setId(userId);
-					user.setFirstName(rs.getString("firstName"));
-					user.setLastName(rs.getString("lastName"));
-					user.setUsername(rs.getString("username"));
-					user.setPassword(rs.getString("password"));
+				user.setId(userId);
+				user.setFirstName(rs.getString("firstName"));
+				user.setLastName(rs.getString("lastName"));
+				user.setUsername(rs.getString("username"));
+				user.setPassword(rs.getString("password"));
 
-					String type = rs.getString("userType");
-					UserType enumVal = UserType.valueOf(type);
-					user.setUserType(enumVal);
-				
+				String type = rs.getString("userType");
+				UserType enumVal = UserType.valueOf(type);
+				user.setUserType(enumVal);
+
 			}
-			
+
 		} catch (SQLException e) {
 
 			e.printStackTrace();
 
 		}
-		
+
 		return user;
 	}
 
@@ -134,22 +134,22 @@ public class UserDaoDB implements UserDao {
 //			pstmt.setString(1, username);
 //			pstmt.setString(2, pass);
 //			rs = pstmt.executeQuery(query);
-			
+
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(query);
 
 			if (rs.next()) {
 
-					user.setId(rs.getInt("id"));
-					user.setFirstName(rs.getString("firstName"));
-					user.setLastName(rs.getString("lastName"));
-					user.setUsername(rs.getString("username"));
-					user.setPassword(pass);
+				user.setId(rs.getInt("id"));
+				user.setFirstName(rs.getString("firstName"));
+				user.setLastName(rs.getString("lastName"));
+				user.setUsername(rs.getString("username"));
+				user.setPassword(pass);
 
-					String type = rs.getString("userType");
-					UserType enumVal = UserType.valueOf(type);
-					user.setUserType(enumVal);
-				
+				String type = rs.getString("userType");
+				UserType enumVal = UserType.valueOf(type);
+				user.setUserType(enumVal);
+
 			}
 
 		} catch (SQLException e) {
@@ -186,6 +186,10 @@ public class UserDaoDB implements UserDao {
 				user.setLastName(rs.getString("lastName"));
 				user.setPassword(rs.getString("password"));
 				user.setUsername(rs.getString("username"));
+				
+				String type = rs.getString("userType");
+				UserType enumVal = UserType.valueOf(type);
+				user.setUserType(enumVal);
 
 				userList.add(user);
 
@@ -196,15 +200,15 @@ public class UserDaoDB implements UserDao {
 			e.printStackTrace();
 
 		}
-		
+
 		for (User user : userList) {
-			
+
 			System.out.println(user);
-			
+
 		}
-				
+
 		return userList;
-		
+
 	}
 
 	public User updateUser(User u) {
@@ -212,30 +216,31 @@ public class UserDaoDB implements UserDao {
 
 		getConnection();
 
-		String query = "Update users set firstName = ?, lastName = ?, password = ?, username = ? where id = ?";
+		String query = "Update users set firstName = ?, lastName = ?, password = ?, username = ?, userType = ? where id = ?";
 
 		try {
 
 			pstmt = conn.prepareStatement(query);
-			pstmt.setInt(5, u.getId());
+			pstmt.setInt(6, u.getId());
 			pstmt.setString(1, u.getFirstName());
 			pstmt.setString(2, u.getLastName());
 			pstmt.setString(3, u.getPassword());
 			pstmt.setString(4, u.getUsername());
-			
+
 //			String type = rs.getString("userType");
 //			UserType enumVal = UserType.valueOf(type);
-//			pstmt.setString(5, user.getUserType().name());
 			
-			//System.out.println(u);
-			
-			int result = pstmt.executeUpdate(); 
-				
-				if (result == 0) {
-					
-					return null;
-					
-				}
+			pstmt.setString(5, u.getUserType().name());
+
+			System.out.println(u);
+
+			int result = pstmt.executeUpdate();
+
+			if (result == 0) {
+
+				return null;
+
+			}
 
 		} catch (SQLException e) {
 			// TODO: handle exception

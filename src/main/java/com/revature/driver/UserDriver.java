@@ -108,17 +108,15 @@ public class UserDriver {
 		System.out.println("Please enter password: ");
 		pass = scan.next();
 
-		
 		System.out.println("Test  Print");
 
-		
 		t = udb.getUser(username, pass);
 
 		Statement stmt = conn.createStatement();
 		String query = "Select * from users where username = '" + username + "' AND password = '" + pass + "'";
 		rs = stmt.executeQuery(query);
-		
-		//System.out.println("Test 1print");
+
+		// System.out.println("Test 1print");
 
 		if (t.getId() == null) {
 
@@ -127,8 +125,8 @@ public class UserDriver {
 		} else {
 
 			try {
-				
-	//			System.out.println("Inside try");
+
+				// System.out.println("Inside try");
 				ussr.login(username, pass);
 
 			} catch (InvalidCredentialsException e) {
@@ -138,7 +136,7 @@ public class UserDriver {
 			}
 
 		}
-		
+
 	}
 
 	public static void getAllUsers() {
@@ -185,8 +183,9 @@ public class UserDriver {
 			System.out.println("2. Last Name");
 			System.out.println("3. Username");
 			System.out.println("4. Password");
-			System.out.println("5. Current User: ");
-			System.out.println("6. Save and Exit");
+			System.out.println("5. User Type");
+			System.out.println("6. Current User: ");
+			System.out.println("7. Save and Exit");
 			System.out.printf("Enter number: ");
 			choice = scan.nextInt();
 
@@ -272,31 +271,57 @@ public class UserDriver {
 
 			case 5:
 
+				System.out.println("Current UserType: " + u.getUserType());
+				System.out.println("Possible types: 1. EMPLOYEE and 2. CUSTOMER ");
+				int ct = scan.nextInt();
+
+				switch (ct) {
+
+				case 1:
+					
+					UserType emp = UserType.EMPLOYEE;
+
+					u.setUserType(emp);
+					
+					break;
+
+				case 2:
+					
+					UserType cus = UserType.CUSTOMER;
+
+					u.setUserType(cus);
+
+					break;
+
+				}
+
+				break;
+
+			case 6:
+
 				System.out.println("Current changes: ");
 				System.out.println(u);
 
 				break;
 
-			case 6:
+			case 7:
 
 				udb.updateUser(u);
 				System.out.println("Changes saved!");
 				System.out.println("New edits: ");
 				System.out.println(u);
 
-				System.exit(0);
-
 				break;
 
 			default:
 
-				System.out.println("Please enter a number between 1-6: ");
+				System.out.println("Please enter a number between 1-7: ");
 
 				break;
 
 			}
 
-		} while (choice != 6);
+		} while (choice != 7);
 
 	}
 
